@@ -1,7 +1,8 @@
 /* Host Table */ 
 create table host (
+	-- id			int auto_increment,
     name        varchar(100) not null,
-    constraint p_name primary key (name)
+    primary key (name)
 );
 
 /* Conference Table */
@@ -10,10 +11,10 @@ create table conference (
     topic        varchar(100) not null,
     start_time   Date not null,
     end_time     Date not null,
-    host_n    varchar(100) not null,
+    host_n    	 varchar(100) not null,
     url          varchar(2048) not null,
     constraint unique_id primary key (id),
-    foreign key (host_n) references host (name)
+    FOREIGN KEY (host_n) REFERENCES host (name)
 );
 
 /* Admin Accounts Table */
@@ -68,11 +69,23 @@ create function login (
             else
                 update logins set login_time=now() where logins.username=username;
             end if;
-        set res = '.ورود با موفقیت انجام شد'
+        set res = '.ورود با موفقیت انجام شد';
     else
-        set res = '.نام کاربری و یا رمز اشتباه است'
+        set res = '.نام کاربری و یا رمز اشتباه است';
     end if;
     return res;
 end
 //
 delimiter ;
+
+delimiter //
+create function addAccount (
+	username varbinary(20), pass varbinary(20))
+	returns char(64)
+	begin
+	declare res char(64);
+	insert into accounts(username, SHA2(pass, 256);
+	return res;
+end
+//
+delimiter //
