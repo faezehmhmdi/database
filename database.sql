@@ -10,10 +10,10 @@ create table conference (
     topic        varchar(100) not null,
     start_time   Date not null,
     end_time     Date not null,
-    host_name    varchar(100) not null,
+    host_n    varchar(100) not null,
     url          varchar(2048) not null,
     constraint unique_id primary key (id),
-    FOREIGN KEY (host_name) REFERENCES host (name) on delete cascade
+    foreign key (host_n) references host (name)
 );
 
 /* Admin Accounts Table */
@@ -43,12 +43,12 @@ create table logins (
 -- Add Conference Function and Host info
 delimiter //
 create function addConference (
-    id varchar(20), topic varchar(100), start_time Date, end_time Date, host_name varchar(100), url varchar(100))
+    id varchar(20), topic varchar(100), start_time Date, end_time Date, host_n varchar(100), url varchar(100))
     returns char(64)
     begin
 	declare res char(64);
             insert into host values (host_name);
-            insert into conference values (id, topic, start_time, end_time, host_name, url);
+            insert into conference values (id, topic, start_time, end_time, host_n, url);
             set res = '.اطلاعات ویدئو کنفرانس با موفقیت وارد شد';
     return res;
 end
@@ -62,7 +62,7 @@ create function login (
     returns char(64)
     begin
     declare res char(64);
-    if (select count(*) from accounts as t where LCASE(t.username)=username and SHA2(pass_text, 256)=pass) = 1 THEN
+    if (select count(*) from accounts where SHA2(pass_text, 256)=pass) = 1 THEN
             if (select count(*) from logins where logins.username=username) = 0 then
                 insert into logins values (username, NOW());
             else
@@ -76,8 +76,3 @@ create function login (
 end
 //
 delimiter ;
-
-
-    
-
-
