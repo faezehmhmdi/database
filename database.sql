@@ -1,7 +1,7 @@
-/* Host Table */ 
 create table host (
-	-- id			int auto_increment,
+	id			int auto_increment,
     name        varchar(100) not null,
+    key (id),
     primary key (name)
 );
 
@@ -84,9 +84,13 @@ create function addAccount (
 	returns char(64)
 	begin
 	declare res char(64);
-	insert into accounts(username, SHA2(pass, 256);
-	set res = '.حساب با موفقیت اضافه شد';
+    if (select count(*) from accounts as t where t.username=username) = 0 then
+	   insert into accounts values (username, SHA2(pass, 256));
+	   set res = '.حساب با موفقیت اضافه شد';
+    else
+        set res = '.حساب در سیستم موجود است';
+    end if;
 	return res;
 end
 //
-delimiter //
+delimiter ;
