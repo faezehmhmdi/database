@@ -85,6 +85,7 @@ create function addAccount (
 	begin
 	declare res char(64);
 	insert into accounts(username, SHA2(pass, 256);
+	set res = '.حساب با موفقیت اضافه شد';
 	return res;
 end
 //
