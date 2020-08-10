@@ -9,13 +9,17 @@ create table hosts (
 -- Conferences Table
 create table conference (
     id           varchar(20) not null,
+	request_sentDate	Date not null,
     topic        varchar(100) not null,
     start_Date   Date not null,
     end_Date     Date not null,
-	start_time	 time (0),
-	end_time	 time (0),
+	start_time	 time (0) not null default '08:00:00',
+	end_time	 time (0) not null default '08:00:00',
     host_n    	 varchar(100) not null,
     url          varchar(2048) not null,
+	supporter_name	varchar(100) not null, -- also we need contact information
+	platform_type	varchar(100) not null, -- skype, webinar and ...
+	isCanceled	bit default 'false',
     primary key (id, topic),
 	constraint times check (start_time <= end_time),
 	constraint dates check (start_Date <= end_Date ),
