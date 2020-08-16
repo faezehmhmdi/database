@@ -1,0 +1,8 @@
+Add Admin.
+Login.
+//Todo if admin forgets the password should be enable to reset password!
+Add Host.
+Add Supporter.
+Add Platform.
+Add Place.
+//Solve LAST_INSERT_ID problem.
