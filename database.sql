@@ -8,7 +8,7 @@ create table Hosts
     key (name, manager)
 );
 
--- Supporter TABLE
+-- Supporter Table
 create table Supporter
 (
     id        int unsigned auto_increment,
@@ -38,6 +38,17 @@ create table Place
     isEmpty boolean      not null default 1,
     primary key (id),
     key (name)
+);
+
+-- Participators Table
+create table participator
+(
+    id     int unsigned auto_increment,
+    name   varchar(255) not null,
+    confId int unsigned,
+    primary key (id),
+    key (name),
+    foreign key (confId) references Conference (id) on update cascade on delete cascade
 );
 
 -- Conferences Table
@@ -83,18 +94,6 @@ create table AdminAcc
     primary key (username)
 );
 
--- Participators Table
-create table participator
-(
-    id     int unsigned auto_increment,
-    name   varchar(255) not null,
-    confId int unsigned,
-    primary key (id),
-    key (name),
-    foreign key (confId) references conference (id) on update cascade on delete cascade
-);
-
-
 -- Login Table
 create table logins
 (
@@ -108,53 +107,14 @@ create table logins
 -- Add Host Function
 delimiter //
 create function addHost(hostName varchar(255), manager varchar(255))
-    returns char(64)
+    returns int unsigned
 begin
-    declare res char(64);
     if (select count(*) from Hosts as h where (h.name = hostName) and (h.manager = manager)) = 0 then
-        insert into Hosts values ('', hostName, manager);
-        set res = 'Host added.';
+        insert into Hosts values (null, hostName, manager);
+		return (select LAST_INSERT_ID());
     else
-        set res = 'Host with the same manager exists.';
+    	return 0;
     end if;
-    return res;
-end //
-delimiter ;
-
--- Add Supporter Function
-delimiter //
-create function addSupporter(SupporterName varchar(255), telephone varchar(16))
-    returns char(64)
-begin
-    declare res char(64);
-    if (select count(*) from Supporter as s where (s.name = supporterName) and (s.telephone = telephone)) = 0 then
-        insert into Supporter values ('', supporterName, telephone);
-        set res = 'Supporter added.';
-    else
-        set res = 'Supporter with same telephone exists.';
-    end if;
-    return res;
-end
-//
-delimiter ;
-
--- Add Platform Function
-delimiter //
-create function addPlatform(platName varchar(255), url varchar(2048), description text)
-    returns char(64)
-begin
-    declare res char(64);
-    if (select count(*)
-        from Platform as p
-        where (p.name = platName)
-          and (p.url = url)
-          and (p.description = description)) = 0 then
-        insert into Platform values ('', platName, url, description);
-        set res = 'Platform added.';
-    else
-        set res = 'Already exists.';
-    end if;
-    return res;
 end
 //
 delimiter ;
@@ -167,10 +127,10 @@ begin
     declare res char(64);
     if (select count(*) from Hosts as h where (h.id = id)) = 1 then
         update Hosts as h
-        set h.name= name,
-            h.manager=manager
+        set h.name = coalesce (name, h.name),
+            h.manager = coalesce (manager, h.manager)
         where h.id = id;
-        set res = 'Host Edited.';
+        set res = 'Host edited.';
     else
         set res = 'Host with id doesn\'t exist.';
     end if;
@@ -179,67 +139,198 @@ end
 //
 delimiter ;
 
+-- Add Supporter Function
+delimiter //
+create function addSupporter(supporterName varchar(255), telephone varchar(16))
+    returns int unsigned
+begin
+    if (select count(*) from Supporter as s where (s.name = supporterName) and (s.telephone = telephone)) = 0 then
+        insert into Supporter values (null, supporterName, telephone);
+        return (select LAST_INSERT_ID());
+    else
+        return 0;
+    end if;
+end
+//
+delimiter ;
 
-/* -- fix defaul beging 1
--- fix defaul beging 1
--- fix defaul beging 1*/
+-- Edit Supporter Function
+delimiter //
+create function editSupporter (id int unsigned, supporterName varchar(255), telephone varchar(16))
+	returns char(64)
+begin
+	declare res char(64);
+	if (select count(*) from Supporter as s where (s.id = id)) = 1 then
+		update Supporter as s
+		set s.name = coalesce (supporterName, s.name),
+			s.telephone = coalesce (telephone, s.telephone)
+		where s.id = id;
+		set res = 'Supporter Edited.';
+	else
+		set res = 'Supporter with id doesn\'t exist.';
+	end if;
+	return res;
+end
+//
+delimiter ;
+
+-- Add Platform Function
+delimiter //
+create function addPlatform (platName varchar(255), url varchar(2048), description text)
+    returns int unsigned
+begin
+    if (select count(*)
+        from Platform as p
+        where (p.name = platName)
+          and (p.url = url)
+          and (p.description = description)) = 0 then
+        insert into Platform values (null, platName, url, description);
+        return (select LAST_INSERT_ID());
+    else
+        return 0;
+    end if;
+end
+//
+delimiter ;
+
+-- Edit Platform Function
+delimiter //
+create function editPlatform (id int unsigned, platName varchar(255), url varchar(2048), description text)
+	returns char(64);
+begin
+	declare res char(64);
+	if (select count(*) from Platform as p where (p.id = id)) = 1 then
+		update Platform as p
+		set p.name = coalesce (platName, p.name),
+			p.url = coalesce (url, p.url),
+			p.description = coalesce (description, p.description)
+		where p.id = id;
+		set res = 'Platform edited.';
+	else
+		set res = 'Platform with id doesn\'t exist.';
+	end if;
+	return res;
+end
+//
+delimiter ;
+
 -- Add Place Function
 delimiter //
-create function addPlace(placName varchar(100), isEmp boolean)
-    returns char(64)
+create function addPlace (placName varchar(255), isEmp boolean)
+    returns int unsigned
 begin
-    declare res char(64);
-    if (select count(*) from Place as p where (p.name = placName)) = 0 then
-        insert into Place values ('', placName, coalesce(isEmp, 1));
-        set res = 'Place added.';
-    else
-        update Place as p set p.isEmpty = isEmp where p.name = placName;
-        set res = 'Updated.';
-    end if;
-    return res;
+    insert into Place values (null, placName, isEmp);
+	return (select LAST_INSERT_ID());
+end
+//
+delimiter ;
+
+-- Edit Place Function
+delimiter //
+create function editPlace (id int unsigned, placName varchar(255), isEmp boolean)
+	returns char(64)
+begin
+	declare res char(64);
+	if (select count(*) from Place as p where (p.id = id)) = 1 then
+		update Place as p
+		set p.name = coalesce (placName, p.name),
+			p.isEmpty = coalesce (isEmp, p.isEmpty)
+		where p.id = id;
+		set res = 'Place edited';
+	else
+		set res = 'Place with id doesn\'t exist.';
+	end if;
+	return res;
+end
+//
+delimiter ;
+
+-- fix foregin key problem
+-- Add Participator Function
+delimiter //
+create function addPartic(name varchar(255))
+	returns char(64)
+begin
+	declare res char(64);
+	declare confID int unsigned;
+	set confID = (select LAST_INSERT_ID() from Conference);
+	if(select count(*)
+		from participator as p 
+		where (p.name = name)
+		and (p.confID = confID)) = 0 then
+		insert into Participator values('', name , confID);
+		set res = 'Participator added.';
+	else
+		set res = 'Already exists.';
+	end if;
+	return res;
+end
+//
+delimiter ;
+
+delimiter //
+create function editPartic(id int unsigned, particName varchar(255))
+	returns char(64)
+begin
+	declare res char(64);
+	-- declare confID = (select LAST_INSERT_ID() from Conference); Should we also change the ConfID ??
+	if (select count(*) from Participator as p where (p.id = id)) = 1 then
+		update Participator as p
+		set p.name = coalesce (particName, p.name)
+		where p.id = id;
+		set res = 'Participator edited.';
+	else
+		set res = 'Participator with id doesn\'t exist.';
+	end if;
+	return res;
 end
 //
 delimiter ;
 
 
--- Add Conference and Supporter and platform and place and host info in their tables
+-- Add Conference Function
 delimiter //
-create function addAllDetails(request_number varchar(100), request_sentDate Date, topic varchar(100), start_Date Date,
-                              end_Date Date, start_time time(0),
-                              end_time time(0), isCanceled bit default 0, isHost bit default 0, hostName varchar(100),
-                              manager varchar(100), supporterName varchar(100),
-                              telephone varchar(11), platformName varchar(100), url varchar(2048),
-                              description varchar(512), placeName varchar(100), isEmpty bit default 1)
-    returns char(64)
+create function addConference(request_number varchar(255), request_sentDate Date, topic varchar(255), start_Date Date,
+                              end_Date Date, start_time time(0), end_time time(0), isCanceled boolean, isHost boolean,
+							  hname varchar(255), hmanager varchar(255),placeName varchar(255), isEmpty boolean,
+							  platformName varchar(255),platUrl varchar(2048), platDescription text,  supnName varchar(255),
+							  supTelephone varchar(16))
+    returns int unsigned
 begin
-    declare res char(64);
-    insert into Hosts values (hostName, manager);
-    insert into Platform values (platformName, url, description);
-    if (select count(*) from Supporter as s where (s.name = supporterName) and (s.telephone = telephone)) = 0 then
-        insert into Supporter values (supporterName, telephone);
-    else
-        set res = 'Supporter Exists';
-        if (select count(*) from Place as plac where plac.name = placeName) = 0 then
-            insert into Place values (placeName, isEmpty);
-        else
-            update Place as p set p.isEmpty = isEmpty where plac.name = placeName;
-            if (select count(*) from Conference as c from)
-
-            end
-            //
-delimiter :
+	declare placeId int unsigned;
+	declare hostId int unsigned;
+	declare platformId int unsigned;
+	declare supporterId int unsigned;
+	set placeId = addPlace (placName, isEmpty);
+	set hostId  = addHost (hname, hmanager);
+	set platformId = addPlatform (platformName, platUrl, platDescription);
+	set supporterId = addSupporter (supnName, supTelephone);
+	if (select count(*)
+		from Conference as c 
+		where (c.request_number = request_number)
+		and (c.request_sentDate = request_sentDate)
+		and (c.topic = topic)) = 0 then
+		insert into Conference values (null, request_number, request_sentDate, topic, start_Date, end_Date, start_time, end_time,
+									   placeId, hostId, platformId, supporterId, isCanceled, isHost);
+		return (select LAST_INSERT_ID());
+	else
+		return 0;
+	end if;
+end
+//
+delimiter ;
 
 
 -- Login Admin Function
 delimiter //
-create function login(username varbinary(20), pass_text varbinary(20))
+create function login(username varbinary(255), pass_text varbinary(255))
     returns char(64)
 begin
     declare res char(64);
-    if (select count(*) from AdminAcc as temp where (temp.username = username) and (SHA2(pass_text, 256) = pass)) =
+    if (select count(*) from AdminAcc as temp where (temp.username = username) and (SHA2(pass_text, 256) = temp.pass)) =
        1 then
         if (select count(*) from logins where logins.username = username) = 0 then
-            insert into logins values (username, NOW());
+            insert into logins values ('', username, NOW());
         else
             update logins set login_time=now() where logins.username = username;
         end if;
@@ -252,9 +343,9 @@ end
 //
 delimiter ;
 
--- Add Admin Function
+-- Add Admin Functionp
 delimiter //
-create function addAdmin(username varbinary(20), pass varbinary(20))
+create function addAdmin(username varbinary(255), pass varbinary(255))
     returns char(64)
 begin
     declare res char(64);
@@ -269,64 +360,21 @@ end
 //
 delimiter ;
 
--- Add Participator Function
-delimiter //
-create function addPartic()
-    end
-//
-delimiter ;
-
--- Edit Conference Info Function
-delimiter //
-create function editConf()
-    end
-//
-delimiter ;
-
--- Edit Participators Info Function
-delimiter //
-create function editPartic()
-    end
-//
-delimiter ;
-
-
 -- Cancel Conference Function
 delimiter //
-create function cancelConf()
-    end
-//
-delimiter ;
-
--- Delete Participator Function
-delimiter //
-create function deletePartic()
-    end
-//
-delimiter ;
-
-
--- Delete Host Function 
-delimiter //
-create function deleteHost()
-    end
-//
-delimiter ;
-
-
--- Trigger for checking timeoverlap of conferences
-delimiter //
-create trigger overlap
-/*before insert on conference
-for each row
+create function cancelConf(id int unsigned)
+	returns char(64)
 begin
-	if exists (select count(*)
-			    from conference as c1, from conference as c2
-				where (c1.start_Date=c2.start_Date) and (c1.end_Date=c2.end_Date) 
-				and (c1.start_time <= c2.end_time) and (c1.end_time >= c2.start_time)) then
-		signal sqlstate '45000' SET MESSAGE_TEXT = 'Overlap';
-	end if;*/
-    end
+	declare res char(64);
+	if (select count(*) from Conference as c where (c.id = id)) = 1 then
+		update Conference as c
+		where c.id = id;
+		set res = 'Conference canceled.';
+	else
+		set res = 'Conference with id doesn\'t exist.';
+	end if;
+	return res;
+end
 //
 delimiter ;
 
