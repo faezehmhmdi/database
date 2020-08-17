@@ -41,7 +41,7 @@ create table Place
 );
 
 -- Participators Table
-create table participator
+create table Participator
 (
     id     int unsigned auto_increment,
     name   varchar(255) not null,
@@ -196,15 +196,15 @@ delimiter ;
 -- Edit Platform Function
 delimiter //
 create function editPlatform (id int unsigned, platName varchar(255), url varchar(2048), description text)
-	returns char(64);
+	returns char(64)
 begin
 	declare res char(64);
 	if (select count(*) from Platform as p where (p.id = id)) = 1 then
-		update Platform as p
-		set p.name = coalesce (platName, p.name),
-			p.url = coalesce (url, p.url),
-			p.description = coalesce (description, p.description)
-		where p.id = id;
+		update Platform as pl
+		set pl.name = coalesce (platName, pl.name),
+			pl.url = coalesce (url, pl.url),
+			pl.description = coalesce (description, pl.description)
+		where pl.id = id;
 		set res = 'Platform edited.';
 	else
 		set res = 'Platform with id doesn\'t exist.';
@@ -301,7 +301,7 @@ begin
 	declare hostId int unsigned;
 	declare platformId int unsigned;
 	declare supporterId int unsigned;
-	set placeId = addPlace (placName, isEmpty);
+	set placeId = addPlace (placeName, isEmpty);
 	set hostId  = addHost (hname, hmanager);
 	set platformId = addPlatform (platformName, platUrl, platDescription);
 	set supporterId = addSupporter (supnName, supTelephone);
@@ -367,8 +367,9 @@ create function cancelConf(id int unsigned)
 begin
 	declare res char(64);
 	if (select count(*) from Conference as c where (c.id = id)) = 1 then
-		update Conference as c
-		where c.id = id;
+		update Conference as co
+		set co.isCanceled = 1
+		where co.id = id;
 		set res = 'Conference canceled.';
 	else
 		set res = 'Conference with id doesn\'t exist.';
@@ -377,5 +378,3 @@ begin
 end
 //
 delimiter ;
-
-
