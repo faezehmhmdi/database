@@ -380,6 +380,24 @@ end
 delimiter ;
 
 delimiter //
+create function undoCancelConf(id int unsigned)
+	returns char(64)
+begin
+	declare res char(64);
+	if (select count(*) from Conference as c where (c.id = id)) = 1 then
+		update Conference as co
+		set co.isCanceled = 0
+		where co.id = id;
+		set res = 'Conference is not canceled.';
+	else
+		set res = 'Conference with id doesn\'t exist.';
+	end if;
+	return res;
+end
+//
+delimiter ;
+
+delimiter //
 create procedure showConfs ()
     begin
     select *
