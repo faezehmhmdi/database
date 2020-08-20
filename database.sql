@@ -293,7 +293,7 @@ delimiter //
 create function addConference(request_number varchar(255), request_sentDate Date, topic varchar(255), start_Date Date,
                               end_Date Date, start_time time(0), end_time time(0), isCanceled boolean, isHost boolean,
 							  hname varchar(255), hmanager varchar(255),placeName varchar(255), isEmpty boolean,
-							  platformName varchar(255),platUrl varchar(2048), platDescription text,  supnName varchar(255),
+							  platformName varchar(255),platUrl varchar(2048), platDescription text, supnName varchar(255),
 							  supTelephone varchar(16))
     returns int unsigned
 begin
@@ -378,3 +378,23 @@ begin
 end
 //
 delimiter ;
+
+delimiter //
+create procedure showConfs ()
+    begin
+    select *
+    from (
+    select Conference.id, Conference.request_number, Conference.topic, Conference.isHost, Conference.start_Date, Hosts.name as hname, Place.name as plname, Platform.name,
+		   Platform.url, Platform.description, Supporter.name as sname, Supporter.telephone
+	from Conference join Hosts
+		on Conference.hostId = Hosts.id
+	join Place
+		on Conference.placeId = Place.id
+	join Platform
+		on Conference.platformId = Platform.id
+	join Supporter
+		on Conference.supporterId = Supporter.id	
+    ) as tmp
+    order by tmp.start_Date desc;
+end;
+//
