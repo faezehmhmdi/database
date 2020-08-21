@@ -1,0 +1,138 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.row{
+    max-width: 1140px;
+    margin: 0 auto;
+}
+
+section{
+    padding: 80px 0;
+}
+
+.box{
+   padding: 1%; 
+}
+
+html{
+    background-color: #fff;
+    color: #555;
+    font-family: 'Nazanin';
+    font-size: 20px;
+    font-weight:300;
+    direction: rtl;
+    text-rendering: optimizeLegibility;
+}
+
+h1{
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #fff;
+    font-size: 240%;
+    word-spacing: 4px;
+    letter-spacing: 1px;
+    direction: rtl;
+}
+
+h2{
+    font-size: 180%;
+    word-spacing: 2px;
+    text-align: center;
+    margin-bottom: 30px; 
+    letter-spacing: 1px;
+    direction:rtl;
+}
+
+.button{
+    display: inline-block;
+    padding: 10px 30px;
+    font-weight: 300;
+    font-family: 'Nazanin';
+    direction: rtl;
+    border: 1px solid black;
+    border-radius: 4px;
+    text-decoration: none;
+    color: black;
+    background-color: #ccc;
+}
+
+input[type=text], input[type=password], input[type=date], input[type=time], input[type=url], textarea{
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: 'Nazanin';
+}
+
+input[type=submit]{
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #64991e;
+  font-family: 'Nazanin';
+  color: white;
+  font-weight: bold;
+  font-size: 100%;
+
+}
+input[type=reset]{
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #cf2e2e;
+  font-family: 'Nazanin';
+  color: white;
+  font-weight: bold;
+  font-size: 100%;
+}
+
+input[type=submit]:hover {
+  background-color: #507a18;
+}
+
+input[type=reset]:hover{
+    background-color: #902020;
+}
+
+.label {
+    font-family: 'Nazanin';
+    color: black;
+    direction: rtl;
+}
+
+textarea {
+    resize : none;
+    direction: rtl;
+}
+
+.myTable {
+    font-family: 'Nazanin';
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.myTable td {
+  border: 1px solid #dddddd;
+  text-align: right;
+  direction: rtl;
+  padding: 8px;
+  font-weight: bold;
+}
+
+.myTable tr:nth-child(even) {
+  background-color: #dddddd;
+}
