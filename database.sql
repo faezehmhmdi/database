@@ -148,7 +148,7 @@ begin
         insert into Supporter values (null, supporterName, telephone);
         return (select LAST_INSERT_ID());
     else
-        return 0;
+		return (select MAX(id) from Supporter where (name = supporterName) and (telephone = telephone));
     end if;
 end
 //
@@ -187,7 +187,7 @@ begin
         insert into Platform values (null, platName, url, description);
         return (select LAST_INSERT_ID());
     else
-        return 0;
+        return (select MAX(id) from Platform where (name = platName) and (url = url) and (description = description));
     end if;
 end
 //
@@ -402,7 +402,7 @@ create procedure showConfs ()
     begin
     select *
     from (
-    select Conference.id, Conference.request_number, Conference.topic, Conference.isHost, Conference.start_Date, Hosts.name as hname, Place.name as plname, Platform.name,
+    select Conference.id, Conference.request_number, Conference.topic, Conference.isHost, Conference.isCanceled, Conference.start_Date, Hosts.name as hname, Place.name as plname, Platform.name,
 		   Platform.url, Platform.description, Supporter.name as sname, Supporter.telephone
 	from Conference join Hosts
 		on Conference.hostId = Hosts.id
