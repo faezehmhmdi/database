@@ -402,7 +402,7 @@ create procedure showConfs ()
     begin
     select *
     from (
-    select Conference.id, Conference.request_number, Conference.topic, Conference.isHost, Conference.isCanceled, Conference.start_Date, Conference.start_time, Conference.end_time, Hosts.name as hname, Place.name as plname, Platform.name,
+    select Conference.id, Conference.request_number, Conference.topic, Conference.isCanceled, Conference.start_Date, Conference.start_time, Conference.end_time, Hosts.name as hname, Place.name as plname, Platform.name,
 		   Platform.url, Platform.description, Supporter.name as sname, Supporter.telephone
 	from Conference join Hosts
 		on Conference.hostId = Hosts.id
