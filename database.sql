@@ -398,6 +398,24 @@ begin
 end
 //
 delimiter ;
+							
+delimiter //
+create function addConfDescription (id int unsigned, descript text)
+	returns char(64)
+begin
+	declare res char(64);
+	if (select count(*) from Conference as c where (c.id = id)) = 1 then
+		update Conference as co
+		set co.confDesc = descript
+		where co.id = id;
+		set res = "desc uptaded";
+	else
+		set res = "Conf with id doesn\'t exist";
+	end if;
+	return res;
+end
+//
+delimiter ;
 
 delimiter //
 create procedure showConfs ()
