@@ -68,6 +68,7 @@ create table Conference
     supporterId      int unsigned,
     isCanceled       boolean               default 0,
     isHost           boolean               default 1, -- if 0 we are guest if 1 we are host
+    confDesc	     text,
     primary key (id),
     key (request_number, topic),
     check (start_time <= end_time),
@@ -86,15 +87,6 @@ create table Conference
         on delete cascade
 );
 
--- Conference Descriptions TABLE
-create table ConfDescription
-(
-	id	int unsigned auto_increment,
-	confDesc text,
-	confID int unsigned,
-	primary key(id),
-	foreign key(confID) references Conference (id)
-);
 
 -- Admin Account Table
 create table AdminAcc
