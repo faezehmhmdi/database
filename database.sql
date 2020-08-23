@@ -86,6 +86,16 @@ create table Conference
         on delete cascade
 );
 
+-- Conference Descriptions TABLE
+create table ConfDescription
+(
+	id	int unsigned auto_increment,
+	confDesc text,
+	confID int unsigned,
+	primary key(id),
+	foreign key(confID) references Conference (id)
+);
+
 -- Admin Account Table
 create table AdminAcc
 (
