@@ -40,16 +40,6 @@ create table Place
     key (name)
 );
 
--- Participators Table
-create table Participator
-(
-    id     int unsigned auto_increment,
-    name   varchar(255) not null,
-    confId int unsigned,
-    primary key (id),
-    key (name),
-    foreign key (confId) references Conference (id) on update cascade on delete cascade
-);
 
 -- Conferences Table
 create table Conference
@@ -68,7 +58,8 @@ create table Conference
     supporterId      int unsigned,
     isCanceled       boolean               default 0,
     isHost           boolean               default 1, -- if 0 we are guest if 1 we are host
-    confDesc	     text,
+	confDesc		 text,
+	confGuests		 text,
     primary key (id),
     key (request_number, topic),
     check (start_time <= end_time),
@@ -87,7 +78,15 @@ create table Conference
         on delete cascade
 );
 
-
+-- Conference Descriptions TABLE
+create table ConfDescription
+(
+	id	int unsigned auto_increment,
+	confDesc text,
+	confID int unsigned,
+	primary key(id),
+	foreign key(confID) references Conference (id)
+);
 -- Admin Account Table
 create table AdminAcc
 (
@@ -313,7 +312,7 @@ begin
 		and (c.request_sentDate = request_sentDate)
 		and (c.topic = topic)) = 0 then
 		insert into Conference values (null, request_number, request_sentDate, topic, start_Date, end_Date, start_time, end_time,
-									   placeId, hostId, platformId, supporterId, isCanceled, isHost);
+									   placeId, hostId, platformId, supporterId, isCanceled, isHost, null);
 		return (select LAST_INSERT_ID());
 	else
 		return 0;
@@ -398,7 +397,7 @@ begin
 end
 //
 delimiter ;
-							
+
 delimiter //
 create function addConfDescription (id int unsigned, descript text)
 	returns char(64)
@@ -422,8 +421,8 @@ create procedure showConfs ()
     begin
     select *
     from (
-    select Conference.id, Conference.request_number, Conference.topic, Conference.isCanceled, Conference.start_Date, Conference.start_time, Conference.end_time, Hosts.name as hname, Place.name as plname, Platform.name,
-		   Platform.url, Platform.description, Supporter.name as sname, Supporter.telephone
+    select Conference.id, Conference.topic, Conference.isCanceled, Conference.start_Date, Conference.start_time, Conference.end_time, Hosts.name as hname, Place.name as plname,
+		   Platform.url, Platform.description, Supporter.name as sname, Supporter.telephone, Conference.confDesc
 	from Conference join Hosts
 		on Conference.hostId = Hosts.id
 	join Place
@@ -436,3 +435,4 @@ create procedure showConfs ()
     order by tmp.start_Date desc;
 end;
 //
+
