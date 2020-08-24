@@ -295,7 +295,7 @@ create function addConference(request_number varchar(255), request_sentDate Date
                               end_Date Date, start_time time(0), end_time time(0), isCanceled boolean, isHost boolean,
 							  hname varchar(255), hmanager varchar(255),placeName varchar(255), isEmpty boolean,
 							  platformName varchar(255),platUrl varchar(2048), platDescription text, supnName varchar(255),
-							  supTelephone varchar(16))
+							  supTelephone varchar(16),confGuests text)
     returns int unsigned
 begin
 	declare placeId int unsigned;
@@ -312,7 +312,7 @@ begin
 		and (c.request_sentDate = request_sentDate)
 		and (c.topic = topic)) = 0 then
 		insert into Conference values (null, request_number, request_sentDate, topic, start_Date, end_Date, start_time, end_time,
-									   placeId, hostId, platformId, supporterId, isCanceled, isHost, null);
+									   placeId, hostId, platformId, supporterId, isCanceled, isHost, null, confGuests);
 		return (select LAST_INSERT_ID());
 	else
 		return 0;
@@ -422,7 +422,7 @@ create procedure showConfs ()
     select *
     from (
     select Conference.id, Conference.topic, Conference.isCanceled, Conference.start_Date, Conference.start_time, Conference.end_time, Hosts.name as hname, Place.name as plname,
-		   Platform.url, Platform.description, Supporter.name as sname, Supporter.telephone, Conference.confDesc
+		   Platform.url, Platform.description, Supporter.name as sname, Supporter.telephone, Conference.confDesc, Conference.confGuests
 	from Conference join Hosts
 		on Conference.hostId = Hosts.id
 	join Place
